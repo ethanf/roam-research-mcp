@@ -1,4 +1,4 @@
-import { Graph, q, createBlock, createPage, batchActions } from '@roam-research/roam-api-sdk';
+import { Graph, q, createBlock, createPage, batchActions, RoamCreateBlock } from '@roam-research/roam-api-sdk';
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
 import { formatRoamDate } from '../../utils/helpers.js';
 
@@ -47,8 +47,8 @@ export class TodoOperations {
     // If more than 10 todos, use batch actions
     const todo_tag = "{{TODO}}";
     if (todos.length > 10) {
-      const actions = todos.map((todo, index) => ({
-        action: 'create-block',
+      const actions: RoamCreateBlock[] = todos.map((todo, index) => ({
+        action: 'create-block' as const,
         location: {
           'parent-uid': targetPageUid,
           order: index
