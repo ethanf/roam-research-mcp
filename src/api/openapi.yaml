@@ -1,10 +1,10 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   title: Roam Research Tools API
   version: 1.0.0
   description: API for interacting with Roam Research tools
 servers:
-  - url: http://localhost:3000
+  - url: https://localhost
     description: Local development server
 paths:
   /tools:
@@ -27,7 +27,6 @@ paths:
     post:
       summary: |-
         Add a list of todo items as individual blocks to today's daily page in Roam. Each item becomes its own actionable block with todo status.
-        NOTE on Roam-flavored markdown: For direct linking: use [[link]] syntax. For aliased linking, use [alias]([[link]]) syntax. Do not concatenate words in links/hashtags - correct: #[[multiple words]] #self-esteem (for typically hyphenated words).
       operationId: toolsroam_add_todoPost
       requestBody:
         required: true
@@ -85,11 +84,7 @@ paths:
   /tools/roam_create_page:
     post:
       summary: |-
-        Create a new standalone page in Roam with optional content using markdown-style formatting. The nesting structure is inferred from markdown indentation (spaces). Best for:
-        - Creating foundational concept pages that other pages will link to/from
-        - Establishing new topic areas that need their own namespace
-        - Setting up reference materials or documentation
-        - Making permanent collections of information.
+        Create a new standalone page in Roam with optional content using markdown-style formatting. The nesting structure is inferred from markdown indentation (spaces).
       operationId: toolsroam_create_pagePost
       requestBody:
         required: true
@@ -121,7 +116,6 @@ paths:
     post:
       summary: |-
         Add a new block to an existing Roam page. If no page specified, adds to today's daily note. Best for capturing immediate thoughts, additions to discussions, or content that doesn't warrant its own page. Can specify page by title or UID.
-        NOTE on Roam-flavored markdown: For direct linking: use [[link]] syntax. For aliased linking, use [alias]([[link]]) syntax. Do not concatenate words in links/hashtags - correct: #[[multiple words]] #self-esteem (for typically hyphenated words).
       operationId: toolsroam_create_blockPost
       requestBody:
         required: true
@@ -156,10 +150,6 @@ paths:
     post:
       summary: |-
         Add a structured outline to an existing page or block (by title text or uid), with customizable nesting levels. Best for:
-        - Adding supplementary structured content to existing pages
-        - Creating temporary or working outlines (meeting notes, brainstorms)
-        - Organizing thoughts or research under a specific topic
-        - Breaking down subtopics or components of a larger concept
       operationId: toolsroam_create_outlinePost
       requestBody:
         required: true
@@ -448,7 +438,6 @@ paths:
     post:
       summary: |-
         Update the content of an existing block identified by its UID. Can either provide new content directly or use a transform pattern to modify existing content.
-        NOTE on Roam-flavored markdown: For direct linking: use [[link]] syntax. For aliased linking, use [alias]([[link]]) syntax. Do not concatenate words in links/hashtags - correct: #[[multiple words]] #self-esteem (for typically hyphenated words).
       operationId: toolsroam_update_blockPost
       requestBody:
         required: true
@@ -502,7 +491,6 @@ paths:
     post:
       summary: |-
         Update multiple blocks in a single batch operation. Each update can provide either new content directly or a transform pattern.
-        NOTE on Roam-flavored markdown: For direct linking: use [[link]] syntax. For aliased linking, use [alias]([[link]]) syntax. Do not concatenate words in links/hashtags - correct: #[[multiple words]] #self-esteem (for typically hyphenated words).
       operationId: toolsroam_update_blocksPost
       requestBody:
         required: true
@@ -614,7 +602,6 @@ paths:
     post:
       summary: |-
         Add a memory or piece of information to remember, stored on the daily page with #[[LLM/Memories]] tag and optional categories. 
-        NOTE on Roam-flavored markdown: For direct linking: use [[link]] syntax. For aliased linking, use [alias]([[link]]) syntax. Do not concatenate words in links/hashtags - correct: #[[multiple words]] #self-esteem (for typically hyphenated words).
       operationId: toolsroam_rememberPost
       requestBody:
         required: true
@@ -671,10 +658,6 @@ paths:
     post:
       summary: |-
         Execute a custom Datomic query on the Roam graph beyond the available search tools. This provides direct access to Roam's query engine for advanced data retrieval. Note: Roam graph is case-sensitive.
-        List of some of Roam's data model Namespaces and Attributes: ancestor (descendants), attrs (lookup), block (children, heading, open, order, page, parents, props, refs, string, text-align, uid), children (view-type), create (email, time), descendant (ancestors), edit (email, seen-by, time), entity (attrs), log (id), node (title), page (uid, title), refs (text).
-        Predicates (clojure.string/includes?, clojure.string/starts-with?, clojure.string/ends-with?, <, >, <=, >=, =, not=, !=).
-        Aggregates (distinct, count, sum, max, min, avg, limit).
-        Tips: Use :block/parents for all ancestor levels, :block/children for direct descendants only; combine clojure.string for complex matching, use distinct to deduplicate, leverage Pull patterns for hierarchies, handle case-sensitivity carefully, and chain ancestry rules for multi-level queries.
       operationId: toolsroam_datomic_queryPost
       requestBody:
         required: true
