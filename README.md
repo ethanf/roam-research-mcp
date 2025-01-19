@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub](https://img.shields.io/github/license/2b3pro/roam-research-mcp)](https://github.com/2b3pro/roam-research-mcp/blob/main/LICENSE)
 
-A Model Context Protocol (MCP) server that provides comprehensive access to Roam Research's API functionality. This server enables AI assistants like Claude to interact with your Roam Research graph through a standardized interface. (A WORK-IN-PROGRESS, personal project not officially endorsed by Roam Research)
+A Model Context Protocol (MCP) server that provides comprehensive access to Roam Research's API functionality. This server enables AI assistants like Claude to interact with your Roam Research graph through a standardized interface. (A WORK-IN-PROGRESS)
 
 <a href="https://glama.ai/mcp/servers/fzfznyaflu"><img width="380" height="200" src="https://glama.ai/mcp/servers/fzfznyaflu/badge" alt="Roam Research MCP server" /></a>
 
@@ -28,7 +28,7 @@ npm run build
 
 ## Features
 
-The server provides powerful tools for interacting with Roam Research:
+The server provides fourteen powerful tools for interacting with Roam Research:
 
 1. `roam_fetch_page_by_title`: Fetch and read a page's content by title, recursively resolving block references up to 4 levels deep
 2. `roam_create_page`: Create new pages with optional content
@@ -44,8 +44,6 @@ The server provides powerful tools for interacting with Roam Research:
 12. `roam_search_by_date`: Search for blocks and pages based on creation or modification dates
 13. `roam_search_for_tag`: Search for blocks containing specific tags with optional filtering by nearby tags
 14. `roam_remember`: Store and categorize memories or information with automatic tagging
-15. `roam_recall`: Recall memories of blocks marked with tag MEMORIES_TAG (see below) or blocks on page title of the same name
-16. `roam_datomic_query`: Execute custom Datalog queries on the Roam graph for advanced data retrieval and analysis
 
 ## Setup
 
@@ -65,6 +63,7 @@ The server provides powerful tools for interacting with Roam Research:
    ROAM_API_TOKEN=your-api-token
    ROAM_GRAPH_NAME=your-graph-name
    MEMORIES_TAG='#[[LLM/Memories]]'
+   PROFILE_PAGE='LLM/Profile' (not yet implemented)
    ```
 
    Option 2: Using MCP settings (Alternative method)
@@ -82,7 +81,8 @@ The server provides powerful tools for interacting with Roam Research:
          "env": {
            "ROAM_API_TOKEN": "your-api-token",
            "ROAM_GRAPH_NAME": "your-graph-name",
-           "MEMORIES_TAG": "#[[LLM/Memories]]"
+           "MEMORIES_TAG": "#[[LLM/Memories]]",
+           "PROFILE_PAGE": "LLM/Profile"
          }
        }
      }
@@ -566,85 +566,6 @@ Returns:
 }
 ```
 
-### Execute Datomic Queries
-
-Execute custom Datalog queries on your Roam graph for advanced data retrieval and analysis:
-
-```typescript
-use_mcp_tool roam-research roam_datomic_query {
-  "query": "[:find (count ?p)\n :where [?p :node/title]]",
-  "inputs": []
-}
-```
-
-Features:
-
-- Direct access to Roam's query engine
-- Support for all Datalog query features:
-  - Complex pattern matching
-  - Aggregation functions (count, sum, max, min, avg, distinct)
-  - String operations (includes?, starts-with?, ends-with?)
-  - Logical operations (<, >, <=, >=, =, not=)
-  - Rules for recursive queries
-- Case-sensitive and case-insensitive search capabilities
-- Efficient querying across the entire graph
-
-Parameters:
-
-- `query`: The Datalog query to execute (required)
-- `inputs`: Optional array of input parameters for the query
-
-Returns:
-
-```json
-{
-  "success": true,
-  "matches": [
-    {
-      "content": "[result data]",
-      "block_uid": "",
-      "page_title": ""
-    }
-  ],
-  "message": "Query executed successfully. Found N results."
-}
-```
-
-Example Queries:
-
-1. Count all pages:
-
-```clojure
-[:find (count ?p)
- :where [?p :node/title]]
-```
-
-2. Case-insensitive text search:
-
-```clojure
-[:find ?string ?title
- :where
- [?b :block/string ?string]
- [(clojure.string/lower-case ?string) ?lower]
- [(clojure.string/includes? ?lower "search term")]
- [?b :block/page ?p]
- [?p :node/title ?title]]
-```
-
-3. Find blocks modified after a date:
-
-```clojure
-[:find ?block_ref ?string
- :in $ ?start_of_day
- :where
- [?b :edit/time ?time]
- [(> ?time ?start_of_day)]
- [?b :block/uid ?block_ref]
- [?b :block/string ?string]]
-```
-
-See Roam_Research_Datalog_Cheatsheet.md for more query examples and syntax documentation.
-
 ### Search Block Hierarchy
 
 Navigate and search through block parent-child relationships:
@@ -740,3 +661,39 @@ To modify or extend the server:
 ## License
 
 MIT License
+
+## CLI Usage
+
+The package includes a CLI tool for testing the REST API:
+
+1. Generate the API client:
+   ```bash
+   npm run generate-client
+   ```
+
+2. Build the CLI:
+   ```bash
+   npm run build-cli
+   ```
+
+3. List available tools:
+   ```bash
+   npm run cli list-tools
+   ```
+
+4. Execute a tool:
+   ```bash
+   npm run cli execute <toolName> -a '<jsonArgs>'
+   ```
+
+   Example:
+   ```bash
+   npm run cli execute roam_fetch_page_by_title -a '{"title": "Example Page"}'
+   ```
+
+The CLI provides:
+- Colored output for better readability
+- Pretty-printed JSON responses
+- Error handling with descriptive messages
+- Command completion and help text
+- Argument validation

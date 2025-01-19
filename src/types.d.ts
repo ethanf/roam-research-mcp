@@ -126,7 +126,6 @@ declare module '@roam-research/roam-api-sdk' {
     action?: 'batch-actions';
     actions: Array<
       | RoamDeletePage
-      | RoamUpdatePage
       | RoamCreatePage
       | RoamDeleteBlock
       | RoamUpdateBlock
